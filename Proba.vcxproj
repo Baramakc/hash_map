@@ -127,7 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="hash_map.c" />
+    <ClCompile Include="hash_map.c">
+      <LanguageStandard_C Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdc17</LanguageStandard_C>
+    </ClCompile>
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>

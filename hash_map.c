@@ -28,12 +28,22 @@ static size_t hash(char* key) {
 }
 
 hash_map_t* hash_map_create(size_t size) {
-	hash_map_t *map = malloc(sizeof(hash_map_t));
+	hash_map_t* map = malloc(sizeof(hash_map_t));
 
 	map->size = size;
 	map->entries = calloc(map->size, sizeof(hash_map_entry_t));
 
 	return map;
+}
+
+void hash_map_free(hash_map_t* map) {
+	for (size_t idx = 0; idx < map->size; idx++) {
+		if (map->entries[idx].key != NULL) {
+			free(map->entries[idx].key);
+		}
+	}
+	free(map->entries);
+	free(map);
 }
 
 static hash_map_t* hash_map_expand(hash_map_t* map) {
@@ -48,13 +58,13 @@ static hash_map_t* hash_map_expand(hash_map_t* map) {
 	return expanded;
 }
 
-hash_map_t* hash_map_insert(hash_map_t* map, char* key, char* value) {
+hash_map_t *hash_map_insert(hash_map_t* map, const char* key, char* value) {
 
 	size_t idx = hash(key) % map->size;
 
 	while (map->entries[idx].key != NULL) {
-		idx++;
-		if (idx = map->size) {
+		idx +=1;
+		if (idx == map->size) {
 			return hash_map_insert(hash_map_expand(map), key, value);
 		}
 	}
@@ -91,12 +101,4 @@ char* hash_map_at(hash_map_t* map, char* key) {
 	return 0;
 }
 
-void hash_map_free(hash_map_t* map) {
-	for (size_t idx = 0; idx < map->size; idx++) {
-		if (map->entries[idx].key != NULL) {
-			free(map->entries[idx].key);
-		}
-	}
-	free(map->entries);
-	free(map);
-}
+
