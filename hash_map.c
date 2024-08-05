@@ -1,7 +1,9 @@
-#include "hash_map.h"
+
 #include "string.h"
 #include "stdlib.h"
 #include "assert.h"
+#include "stddef.h"
+#include "stdbool.h"
 //Добавить ассерты для безопастности
 
 typedef struct _hash_map_t hash_map_t;
@@ -15,6 +17,16 @@ struct _hash_map_t {
 	hash_map_entry_t* entries;
 	size_t size;
 };
+
+void hash_map_free(hash_map_t* map) {
+	for (size_t idx = 0; idx < map->size; idx++) {
+		if (map->entries[idx].key != NULL) {
+			free(map->entries[idx].key);
+		}
+	}
+	free(map->entries);
+	free(map);
+}
 
 static size_t hash(char* key) {
 	size_t hash = 0x12345678;
@@ -36,17 +48,23 @@ hash_map_t* hash_map_create(size_t size) {
 	return map;
 }
 
-void hash_map_free(hash_map_t* map) {
-	for (size_t idx = 0; idx < map->size; idx++) {
-		if (map->entries[idx].key != NULL) {
-			free(map->entries[idx].key);
+hash_map_t* hash_map_insert(hash_map_t* map, const char* key, char* value) {
+
+	size_t idx = hash(key) % map->size;
+
+	while (map->entries[idx].key != NULL) {
+		idx += 1;
+		if (idx == map->size) {
+			return hash_map_insert(hash_map_expand(map), key, value);
 		}
 	}
-	free(map->entries);
-	free(map);
+	map->entries[idx].key = calloc(strlen(key) + 1, sizeof(char));
+	map->entries[idx].value = value;
+
+	return map;
 }
 
-static hash_map_t* hash_map_expand(hash_map_t* map) {
+hash_map_t* hash_map_expand(hash_map_t* map) {
 	hash_map_t* expanded = hash_map_create(map->size * 2);
 
 	for (size_t idx = 0; idx < map->size; idx++) {
@@ -58,34 +76,18 @@ static hash_map_t* hash_map_expand(hash_map_t* map) {
 	return expanded;
 }
 
-hash_map_t *hash_map_insert(hash_map_t* map, const char* key, char* value) {
-
-	size_t idx = hash(key) % map->size;
-
-	while (map->entries[idx].key != NULL) {
-		idx +=1;
-		if (idx == map->size) {
-			return hash_map_insert(hash_map_expand(map), key, value);
-		}
-	}
-
-	map->entries[idx].key = calloc(strlen(key) + 1, sizeof(char));
-	map->entries[idx].value = value;
-
-	return map;
-}
-
 bool hash_map_has_key(hash_map_t* map, char* key) {
 	for (size_t idx = hash(key) % map->size; idx < map->size; idx++) {
 		char* current = map->entries[idx].key;
 
 		if (current == NULL) continue;
-		if (!strcmp(current,key)) {
+		if (!strcmp(current, key)) {
 			return true;
 		}
 		return false;
 	}
 }
+
 
 char* hash_map_at(hash_map_t* map, char* key) {
 	for (size_t idx = hash(key) % map->size; idx < map->size; idx++) {
@@ -100,5 +102,3 @@ char* hash_map_at(hash_map_t* map, char* key) {
 	assert(false);
 	return 0;
 }
-
-
