@@ -4,13 +4,13 @@
 main(void) {
 	hash_map_t* map = hash_map_create(2);
 
-	char* keys[6] = { "I", "don't", "know", "what", "I", "did" };
+	const char* keys[3] = {"What", "I", "did?"};
 
-	for (char idx = "0"; idx < "6"; idx++) {
+	for (char idx = '0'; idx < '3'; idx++) {
 		map = hash_map_insert(map, keys[idx], idx);
 	}
 
-	for (char idx = "0"; idx < "6"; idx++) {
+	for (char idx = '0'; idx < '3'; idx++) {
 		printf("map[\"%s\"] = %s\n", keys[idx], hash_map_at(map, keys[idx]));
 	}
 
