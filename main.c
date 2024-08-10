@@ -4,14 +4,14 @@
 main(void) {
 	hash_map_t* map = hash_map_create(2);
 
-	const char* keys[3] = {"What", "I", "did?"};
+	const char* keys[3] = { "What", "did?","my" };
 
-	for (char idx = '0'; idx < '3'; idx++) {
-		map = hash_map_insert(map, keys[idx], idx);
+	for (int idx = 0; idx < 3; idx++) {
+		map = hash_map_insert(map, keys[idx], (char)idx);
 	}
 
-	for (char idx = '0'; idx < '3'; idx++) {
-		printf("map[\"%s\"] = %s\n", keys[idx], hash_map_at(map, keys[idx]));
+	for (int idx = 0; idx < 3; idx++) {
+		printf("map[\"%s\"] = %s\n", keys[idx], hash_map_at(map, (char)keys[idx]));
 	}
 
 	hash_map_free(map);
